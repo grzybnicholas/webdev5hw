@@ -1,4 +1,3 @@
-// Client-side code (React)
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -13,6 +12,16 @@ function App() {
   const fetchTasks = async () => {
     const response = await axios.get('https://webdev5-fb2f4156b74d.herokuapp.com/api/tasks');
     setTasks(response.data);
+  };
+
+  const fetchTaskById = async (id) => {
+    try {
+      const response = await axios.get(`https://webdev5-fb2f4156b74d.herokuapp.com/api/tasks/${id}`);
+      alert(`Task: ${response.data.title}\nCompleted: ${response.data.completed}`);
+    } catch (error) {
+      console.error('Error fetching task:', error);
+      alert('Failed to fetch task.');
+    }
   };
 
   const addTask = async () => {
@@ -31,6 +40,13 @@ function App() {
     const response = await axios.put(`https://webdev5-fb2f4156b74d.herokuapp.com/api/tasks/${id}`, { completed: !completed });
     setTasks(tasks.map(task => (task._id === id ? response.data : task)));
   };
+
+  const apiRoutes = [
+    { method: 'GET', path: '/api/tasks', description: 'Get all tasks' },
+    { method: 'GET', path: '/api/tasks/:id', description: 'Get single task by ID' },
+    { method: 'POST', path: '/api/tasks', description: 'Create new task' },
+    { method: 'DELETE', path: '/api/tasks/:id', description: 'Delete task by ID' }
+  ];
 
   return (
     <div className="App">
@@ -53,14 +69,35 @@ function App() {
               {task.title}
             </span>
             <button onClick={() => deleteTask(task._id)}>Delete</button>
+            <button onClick={() => fetchTaskById(task._id)}>View</button>
           </li>
         ))}
       </ul>
+
+      <div className="api-routes">
+        <h2>API Routes</h2>
+        <ul>
+          {apiRoutes.map(route => (
+            <li key={route.path}>
+              <strong>{route.method}</strong> - 
+              <a href={`https://webdev5-fb2f4156b74d.herokuapp.com${route.path}`} target="_blank" rel="noopener noreferrer">
+                {route.path}
+              </a> - {route.description}
+            </li>
+          ))}
+        </ul>
+        <p>Base API URL: 
+          <a href="https://webdev5-fb2f4156b74d.herokuapp.com/" target="_blank" rel="noopener noreferrer">
+            https://webdev5-fb2f4156b74d.herokuapp.com/
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
 
 export default App;
+
 
 
 
